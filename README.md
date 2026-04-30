@@ -20,9 +20,9 @@ Two pieces:
 
 ## Findings
 
-Every shipped level is solvable. **2,504** of Lumosity's canned solutions
-are already optimal; the remaining **54** are sub-optimal — **32** waste
-exactly one fuel and **22** waste two.
+Every shipped level is solvable. **2,504** of Lumosity's supplied
+solutions are already optimal; the remaining **54** are sub-optimal —
+**32** waste exactly one fuel and **22** waste two.
 
 ## Run locally
 
@@ -46,59 +46,36 @@ so no extraction step is needed.
 
 ## Example solver output
 
-```
-==> Pet Detective solver — 6 CPU threads
-  levels: ../web/public/data/levels.txt
-  sols:   ../web/public/data/solutions.txt
-  json:   ../web/public/data/precomputed.json
+```ansi
+[1m[96m==>[39m[0m [1mPet Detective solver — 6 CPU threads[0m
+[2m  levels:[0m ../web/public/data/levels.txt
+[2m  sols:  [0m ../web/public/data/solutions.txt
+[2m  json:  [0m ../web/public/data/precomputed.json
 
-Parsed: 2558 levels, 2558 canned solutions
+[1m[92mParsed:[39m[0m 2558 levels, 2558 supplied solutions
 
-═══ Summary ════════════════════════════════════════
-  Total: 2558 levels solved in 2.13s
-         (1203.4 levels/sec wall-clock)
+  [1mLumosity's supplied solutions:[0m [2m2558 levels[0m [2m· solved in 2.39 s (1071 levels/sec)[0m
+  ─────────────────────────────
+    [32moptimal    [39m  [32m████████████████████████████████████████[39m  [1m2504[0m   97.9%
+    [33m+1 fuel    [39m  [33m█                                       [39m  [1m  32[0m    1.3%
+    [33m+2 fuel    [39m  [33m█                                       [39m  [1m  22[0m    0.9%
 
-BFS optimum vs game's par_moves
-  ✓  2503  optimum == par   (par is exactly optimal)
-  ↓    55  optimum  < par   (par is loose; level beatable in fewer moves)
-  !     0  optimum  > par   (shouldn't happen — model error or unsolvable level)
+  [1mSub-optimal levels by pet count[0m
+  ───────────────────────────────
+    2–7 pets    [2m·           [0m  [2m 0[0m / [2m1534[0m     0.0%
+    8 pets      [33m█[39m             [1m 2[0m /  256     0.8%
+    9 pets      [33m███[39m           [1m 5[0m /  256     2.0%
+    10 pets     [33m██████████[39m    [1m21[0m /  256     8.2%
+    11 pets     [33m████████████[39m  [1m26[0m /  256    10.2%
 
-Canned Lumosity solution vs BFS optimum
-  ✓  2504  canned == BFS    (the shipped solution is optimal)
-  ↑    54  canned  > BFS    (shipped solution is sub-optimal)
-
-Per-group breakdown
-  pets   size     n  opt=par  opt<par  opt>par  can=opt  can>opt
-     2    3x3   126     126        0        0      126        0
-     2    5x3   128     128        0        0      128        0
-     3    3x3   128     128        0        0      128        0
-     3    6x4   128     128        0        0      128        0
-     4    4x3   128     128        0        0      128        0
-     4    6x4   128     128        0        0      128        0
-     5    4x3   128     128        0        0      128        0
-     5    6x4   128     128        0        0      128        0
-     6    5x3   128     128        0        0      128        0
-     6    6x4   128     128        0        0      128        0
-     7    5x3   128     128        0        0      128        0
-     7    6x4   128     128        0        0      128        0
-     8    6x3   128     128        0        0      128        0
-     8    6x4   128     126        2        0      126        2
-     9    5x4   128     125        3        0      125        3
-     9    6x4   128     126        2        0      126        2
-    10    6x4   256     235       21        0      235       21
-    11    6x4   256     229       27        0      230       26
-
-Distribution of canned-vs-optimum fuel gap
-  +1  fuel    32  ████████████████████████████████████████
-  +2  fuel    22  ████████████████████████████
-
-Sample: 54 canned solutions are sub-optimal — top 5 by gap:
-  level 1964  pets=9   par=28   BFS=26   canned=28   gap=+2  optimal=`CBcDEGdgIFbfAiHeha`  canned=`DEBGgdIFbfAiHCceha`
-  level 2067  pets=10  par=32   BFS=30   canned=32   gap=+2  optimal=`DHBdhIFbGAgiEfeCaJcj`  canned=`HDBdhIFbGAgiEfeCaJcj`
-  level 2073  pets=10  par=36   BFS=34   canned=36   gap=+2  optimal=`FGIgCcJEefiDAHjBdhab`  canned=`AHDIhdBCcJaFbEefiGjg`
-  level 2146  pets=10  par=29   BFS=27   canned=29   gap=+2  optimal=`IDidCHEceJGAjFfBhabg`  canned=`AIDidCHEceJGjFfBhabg`
-  level 2164  pets=10  par=31   BFS=29   canned=31   gap=+2  optimal=`AaIBDFfJbGiCdjEHcghe`  canned=`IBDFfJdCbGiAajEHcghe`
-Wrote: ../web/public/data/precomputed.json
+  [1mWorst gaps (showing 5 of 54)[0m
+  ────────────────────────────
+    level 1964   9 pets  given 28 → optimal 26  ([1m[33m+2[39m[0m)  optimal=`[32mCBcDEGdgIFbfAiHeha[39m`  given=`[33mDEBGgdIFbfAiHCceha[39m`
+    level 2067  10 pets  given 32 → optimal 30  ([1m[33m+2[39m[0m)  optimal=`[32mDHBdhIFbGAgiEfeCaJcj[39m`  given=`[33mHDBdhIFbGAgiEfeCaJcj[39m`
+    level 2073  10 pets  given 36 → optimal 34  ([1m[33m+2[39m[0m)  optimal=`[32mFGIgCcJEefiDAHjBdhab[39m`  given=`[33mAHDIhdBCcJaFbEefiGjg[39m`
+    level 2146  10 pets  given 29 → optimal 27  ([1m[33m+2[39m[0m)  optimal=`[32mIDidCHEceJGAjFfBhabg[39m`  given=`[33mAIDidCHEceJGjFfBhabg[39m`
+    level 2164  10 pets  given 31 → optimal 29  ([1m[33m+2[39m[0m)  optimal=`[32mAaIBDFfJbGiCdjEHcghe[39m`  given=`[33mIBDFfJdCbGiAajEHcghe[39m`
+[1m[92mWrote:[39m[0m ../web/public/data/precomputed.json
 ```
 
 ## Acknowledgements

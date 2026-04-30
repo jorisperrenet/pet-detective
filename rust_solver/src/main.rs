@@ -5,6 +5,7 @@
 //! Output JSON: one entry per level, fields used by `web/src/lib/precomputed.ts`:
 //!   { "i", "p", "w", "h", "par", "t", "fuel", "hist", "canned", "cf" }
 
+use std::collections::BTreeMap;
 use std::fmt::Write as _;
 use std::path::PathBuf;
 use std::time::Instant;
@@ -58,7 +59,7 @@ fn main() {
     let parsed = parser::parse_levels(&levels_text);
     let solutions = parser::parse_solutions(&solutions_text);
     println!(
-        "{} {} levels, {} canned solutions",
+        "{} {} levels, {} supplied solutions",
         "Parsed:".bright_green().bold(),
         parsed.len(),
         solutions.len()
@@ -161,230 +162,147 @@ fn write_json(outcomes: &[LevelOutcome], out_path: &std::path::Path) {
 
 fn print_summary(outcomes: &[LevelOutcome], elapsed: std::time::Duration) {
     let total = outcomes.len();
-    let mut bfs_eq_par = 0;
-    let mut bfs_lt_par = 0;
-    let mut bfs_gt_par = 0;
-    let mut bfs_failed = 0;
-    let mut canned_eq_bfs = 0;
-    let mut canned_lt_bfs = 0; // shouldn't happen if BFS is optimal
-    let mut canned_gt_bfs = 0;
-    let mut canned_invalid = 0;
-    let mut canned_missing = 0;
+
+    // Per-pet-count totals and per-pet-count imperfect counts.
+    let mut total_by_pet: BTreeMap<u8, usize> = BTreeMap::new();
+    let mut imperfect_by_pet: BTreeMap<u8, usize> = BTreeMap::new();
+    // Counts per fuel-gap (gap = supplied_fuel - bfs_fuel; only positive gaps).
+    let mut count_by_gap: BTreeMap<u32, usize> = BTreeMap::new();
+    let mut optimal_count: usize = 0;
+    let mut sample: Vec<(&LevelOutcome, u32)> = Vec::new();
 
     for o in outcomes {
-        match o.bfs_fuel {
-            None => bfs_failed += 1,
-            Some(f) if f == o.par_moves => bfs_eq_par += 1,
-            Some(f) if f < o.par_moves => bfs_lt_par += 1,
-            Some(_) => bfs_gt_par += 1,
-        }
-        match (o.bfs_fuel, o.canned_fuel, o.canned_solution.is_empty()) {
-            (_, _, true) => canned_missing += 1,
-            (_, None, false) => canned_invalid += 1,
-            (Some(b), Some(c), false) if b == c => canned_eq_bfs += 1,
-            (Some(b), Some(c), false) if c < b => canned_lt_bfs += 1,
-            (Some(_), Some(_), false) => canned_gt_bfs += 1,
-            _ => {}
-        }
-    }
-
-    println!();
-    println!("{}", "═══ Summary ════════════════════════════════════════".bright_cyan().bold());
-    println!(
-        "  {} {} levels solved in {:.2}s",
-        "Total:".dimmed(),
-        total.bold(),
-        elapsed.as_secs_f64()
-    );
-    println!(
-        "         ({:.1} levels/sec wall-clock)",
-        total as f64 / elapsed.as_secs_f64()
-    );
-    println!();
-
-    println!("{}", "BFS optimum vs game's par_moves".bold().underline());
-    println!(
-        "  {} {:>5}  optimum == par   ({})",
-        "✓".green().bold(),
-        bfs_eq_par.bright_green().bold(),
-        "par is exactly optimal"
-    );
-    println!(
-        "  {} {:>5}  optimum  < par   ({})",
-        "↓".yellow().bold(),
-        bfs_lt_par.yellow().bold(),
-        "par is loose; level beatable in fewer moves"
-    );
-    println!(
-        "  {} {:>5}  optimum  > par   ({})",
-        "!".red().bold(),
-        bfs_gt_par.red().bold(),
-        "shouldn't happen — model error or unsolvable level"
-    );
-    if bfs_failed > 0 {
-        println!(
-            "  {} {:>5}  BFS failed       (no solution found at all)",
-            "✗".red().bold(),
-            bfs_failed.red().bold()
-        );
-    }
-
-    println!();
-    println!("{}", "Canned Lumosity solution vs BFS optimum".bold().underline());
-    println!(
-        "  {} {:>5}  canned == BFS    ({})",
-        "✓".green().bold(),
-        canned_eq_bfs.bright_green().bold(),
-        "the shipped solution is optimal"
-    );
-    println!(
-        "  {} {:>5}  canned  > BFS    ({})",
-        "↑".yellow().bold(),
-        canned_gt_bfs.yellow().bold(),
-        "shipped solution is sub-optimal"
-    );
-    if canned_lt_bfs > 0 {
-        println!(
-            "  {} {:>5}  canned  < BFS    ({})",
-            "?".magenta().bold(),
-            canned_lt_bfs.magenta().bold(),
-            "BFS not finding optimum — bug"
-        );
-    }
-    if canned_invalid > 0 {
-        println!(
-            "  {} {:>5}  canned invalid   ({})",
-            "✗".red().bold(),
-            canned_invalid.red().bold(),
-            "solution string can't be replayed"
-        );
-    }
-    if canned_missing > 0 {
-        println!(
-            "  {} {:>5}  canned missing   ({})",
-            "·".dimmed(),
-            canned_missing.dimmed(),
-            "no solution string for this level"
-        );
-    }
-
-    // Per-group breakdown — group by (pet_count, grid_size)
-    println!();
-    println!("{}", "Per-group breakdown".bold().underline());
-    println!(
-        "  {:>4}  {:>5}  {:>4}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}",
-        "pets".dimmed(),
-        "size".dimmed(),
-        "n".dimmed(),
-        "opt=par".dimmed(),
-        "opt<par".dimmed(),
-        "opt>par".dimmed(),
-        "can=opt".dimmed(),
-        "can>opt".dimmed()
-    );
-    let mut groups: Vec<(u8, u8, u8, Vec<&LevelOutcome>)> = Vec::new();
-    for o in outcomes {
-        let key = (o.pet_count, o.grid_w, o.grid_h);
-        if let Some(g) = groups.iter_mut().find(|g| (g.0, g.1, g.2) == key) {
-            g.3.push(o);
-        } else {
-            groups.push((key.0, key.1, key.2, vec![o]));
-        }
-    }
-    groups.sort_by_key(|g| (g.0, g.1, g.2));
-    for (pc, w, h, outs) in &groups {
-        let mut eq = 0;
-        let mut lt = 0;
-        let mut gt = 0;
-        let mut ce = 0;
-        let mut cg = 0;
-        for o in outs {
-            match o.bfs_fuel {
-                Some(f) if f == o.par_moves => eq += 1,
-                Some(f) if f < o.par_moves => lt += 1,
-                Some(_) => gt += 1,
-                None => {}
+        *total_by_pet.entry(o.pet_count).or_default() += 1;
+        match (o.bfs_fuel, o.canned_fuel) {
+            (Some(b), Some(c)) if c > b => {
+                let gap = c - b;
+                *count_by_gap.entry(gap).or_default() += 1;
+                *imperfect_by_pet.entry(o.pet_count).or_default() += 1;
+                sample.push((o, gap));
             }
-            if let (Some(b), Some(c)) = (o.bfs_fuel, o.canned_fuel) {
-                if c == b {
-                    ce += 1;
-                } else if c > b {
-                    cg += 1;
-                }
+            _ => optimal_count += 1,
+        }
+    }
+    sample.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.idx.cmp(&b.0.idx)));
+
+    // Top section: how many supplied solutions are optimal vs off-by-N fuel.
+    println!();
+    println!(
+        "  {} {} {}",
+        "Lumosity's supplied solutions:".bold(),
+        format!("{} levels", total).dimmed(),
+        format!("· solved in {:.2} s ({:.0} levels/sec)", elapsed.as_secs_f64(), total as f64 / elapsed.as_secs_f64()).dimmed()
+    );
+    println!("  ─────────────────────────────");
+    let bar_w_top = 40usize;
+    let max_top = optimal_count
+        .max(*count_by_gap.values().max().unwrap_or(&0));
+    let scale_bar = |n: usize, width: usize, max: usize| -> String {
+        if max == 0 || n == 0 {
+            return String::new();
+        }
+        let len = ((n * width + max - 1) / max).max(1).min(width);
+        "█".repeat(len)
+    };
+    println!(
+        "    {:<11}  {:<width$}  {:>4}   {:>4.1}%",
+        "optimal".green(),
+        scale_bar(optimal_count, bar_w_top, max_top).green(),
+        optimal_count.bold(),
+        100.0 * optimal_count as f64 / total as f64,
+        width = bar_w_top
+    );
+    for (&gap, &count) in &count_by_gap {
+        let label = format!("+{} fuel", gap);
+        println!(
+            "    {:<11}  {:<width$}  {:>4}   {:>4.1}%",
+            label.yellow(),
+            scale_bar(count, bar_w_top, max_top).yellow(),
+            count.bold(),
+            100.0 * count as f64 / total as f64,
+            width = bar_w_top
+        );
+    }
+
+    // Where the imperfections live (by pet count). Skip if everything's perfect.
+    if !imperfect_by_pet.is_empty() {
+        let max_imperfect = *imperfect_by_pet.values().max().unwrap();
+        let bar_w_pet = 12usize;
+
+        // Aggregate the all-perfect low pet-counts into one "X-Y pets" row.
+        let pets: Vec<u8> = total_by_pet.keys().copied().collect();
+        let lowest_imperfect = *imperfect_by_pet.keys().next().unwrap();
+        let mut perfect_total = 0usize;
+        let mut perfect_low: Option<u8> = None;
+        let mut perfect_high: Option<u8> = None;
+        for &pc in &pets {
+            if pc < lowest_imperfect {
+                perfect_total += total_by_pet[&pc];
+                perfect_low.get_or_insert(pc);
+                perfect_high = Some(pc);
             }
         }
-        let size_str = format!("{}x{}", w, h);
-        println!(
-            "  {:>4}  {:>5}  {:>4}  {:>6}  {:>6}  {:>6}  {:>6}  {:>6}",
-            pc,
-            size_str,
-            outs.len(),
-            if eq > 0 { eq.green().to_string() } else { eq.dimmed().to_string() },
-            if lt > 0 { lt.yellow().to_string() } else { lt.dimmed().to_string() },
-            if gt > 0 { gt.red().to_string() } else { gt.dimmed().to_string() },
-            if ce > 0 { ce.green().to_string() } else { ce.dimmed().to_string() },
-            if cg > 0 { cg.yellow().to_string() } else { cg.dimmed().to_string() },
-        );
-    }
-
-    // Show sample sub-optimal canned solutions, with a histogram of gaps.
-    let mut suboptimal: Vec<(&LevelOutcome, u32)> = outcomes
-        .iter()
-        .filter_map(|o| match (o.bfs_fuel, o.canned_fuel) {
-            (Some(b), Some(c)) if c > b => Some((o, c - b)),
-            _ => None,
-        })
-        .collect();
-    if !suboptimal.is_empty() {
-        // Largest gap first.
-        suboptimal.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.idx.cmp(&b.0.idx)));
 
         println!();
-        println!("{}", "Distribution of canned-vs-optimum fuel gap".bold().underline());
-        let max_gap = suboptimal.iter().map(|(_, g)| *g).max().unwrap_or(0);
-        let mut counts: Vec<usize> = vec![0; (max_gap as usize) + 1];
-        for (_, g) in &suboptimal {
-            counts[*g as usize] += 1;
-        }
-        let max_count = *counts.iter().max().unwrap_or(&0);
-        let bar_width = 40usize;
-        for (gap, &count) in counts.iter().enumerate() {
-            if gap == 0 {
-                continue;
-            }
-            let bar_len = if max_count == 0 {
-                0
+        println!("  {}", "Sub-optimal levels by pet count".bold());
+        println!("  ───────────────────────────────");
+        if let (Some(lo), Some(hi)) = (perfect_low, perfect_high) {
+            let label = if lo == hi {
+                format!("{} pets", lo)
             } else {
-                (count * bar_width + max_count - 1) / max_count
+                format!("{}–{} pets", lo, hi)
             };
-            let bar: String = "█".repeat(bar_len);
             println!(
-                "  +{:<2} fuel  {:>4}  {}",
-                gap.to_string().yellow(),
-                count.bold(),
-                bar.yellow()
+                "    {:<10}  {:<width$}  {:>2} / {:>4}    {:>4.1}%",
+                label,
+                "·".dimmed(),
+                0.dimmed(),
+                perfect_total.dimmed(),
+                0.0,
+                width = bar_w_pet
             );
         }
-
-        println!();
-        println!(
-            "{} {} canned solutions are sub-optimal — top 5 by gap:",
-            "Sample:".bold(),
-            suboptimal.len().yellow().bold()
-        );
-        for (o, gap) in suboptimal.iter().take(5) {
+        for (&pc, &imp) in &imperfect_by_pet {
+            let total_pc = total_by_pet[&pc];
+            let pct = 100.0 * imp as f64 / total_pc as f64;
+            let label = format!("{} pets", pc);
+            let bar = scale_bar(imp, bar_w_pet, max_imperfect);
+            let pad: String = " ".repeat(bar_w_pet.saturating_sub(bar.chars().count()));
             println!(
-                "  level {:>4}  pets={:<2}  par={:<3}  BFS={:<3}  canned={:<3}  gap=+{}  optimal=`{}`  canned=`{}`",
+                "    {:<10}  {}{}  {:>2} / {:>4}    {:>4.1}%",
+                label,
+                bar.yellow(),
+                pad,
+                imp.bold(),
+                total_pc,
+                pct
+            );
+        }
+    }
+
+    // Largest fuel gaps — concrete examples.
+    if !sample.is_empty() {
+        let shown = 5.min(sample.len());
+        let header = if sample.len() > shown {
+            format!("Worst gaps (showing {} of {})", shown, sample.len())
+        } else {
+            "Worst gaps".to_string()
+        };
+        let underline: String = "─".repeat(header.chars().count());
+        println!();
+        println!("  {}", header.bold());
+        println!("  {}", underline);
+        for (o, gap) in sample.iter().take(shown) {
+            println!(
+                "    level {:>4}  {:>2} pets  given {} → optimal {}  ({})  optimal=`{}`  given=`{}`",
                 o.idx,
                 o.pet_count,
                 o.par_moves,
                 o.bfs_fuel.unwrap(),
-                o.canned_fuel.unwrap(),
-                gap.to_string().yellow().bold(),
+                format!("+{}", gap).yellow().bold(),
                 o.bfs_history.green(),
                 o.canned_solution.yellow(),
             );
         }
     }
-
 }
