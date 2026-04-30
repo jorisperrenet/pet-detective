@@ -1,0 +1,15 @@
+[package]
+name = "pet_detective_solver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rayon = "1.10"
+indicatif = { version = "0.17", features = ["rayon"] }
+owo-colors = "4"
+ahash = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1

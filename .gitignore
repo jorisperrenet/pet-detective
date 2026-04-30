@@ -1,0 +1,10 @@
+# Build output
+web/dist/
+web/node_modules/
+rust_solver/target/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

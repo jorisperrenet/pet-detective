@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    height: 100%;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top, #2a2a30 0%, #161618 60%) fixed,
+      #0f0f10 fixed;
+    color: #e8e8ec;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: #f47049;
+    color: #1f1f22;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition active:scale-95 select-none;
+  }
+  .btn-primary {
+    @apply btn bg-car text-bg-deep hover:bg-orange-400 shadow-lg shadow-orange-500/20;
+  }
+  .btn-ghost {
+    @apply btn text-gray-300 hover:bg-white/5;
+  }
+  .panel {
+    @apply bg-bg-panel/60 backdrop-blur rounded-2xl border border-white/5 shadow-xl;
+  }
+}
+
+/* fade-in for components */
+.fade-in {
+  animation: fadeIn 0.35s ease-out both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
