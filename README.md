@@ -46,37 +46,7 @@ so no extraction step is needed.
 
 ## Example solver output
 
-```ansi
-[1m[96m==>[39m[0m [1mPet Detective solver — 6 CPU threads[0m
-[2m  levels:[0m ../web/public/data/levels.txt
-[2m  sols:  [0m ../web/public/data/solutions.txt
-[2m  json:  [0m ../web/public/data/precomputed.json
-
-[1m[92mParsed:[39m[0m 2558 levels, 2558 supplied solutions
-
-  [1mLumosity's supplied solutions:[0m [2m2558 levels[0m [2m· solved in 2.39 s (1071 levels/sec)[0m
-  ─────────────────────────────
-    [32moptimal    [39m  [32m████████████████████████████████████████[39m  [1m2504[0m   97.9%
-    [33m+1 fuel    [39m  [33m█                                       [39m  [1m  32[0m    1.3%
-    [33m+2 fuel    [39m  [33m█                                       [39m  [1m  22[0m    0.9%
-
-  [1mSub-optimal levels by pet count[0m
-  ───────────────────────────────
-    2–7 pets    [2m·           [0m  [2m 0[0m / [2m1534[0m     0.0%
-    8 pets      [33m█[39m             [1m 2[0m /  256     0.8%
-    9 pets      [33m███[39m           [1m 5[0m /  256     2.0%
-    10 pets     [33m██████████[39m    [1m21[0m /  256     8.2%
-    11 pets     [33m████████████[39m  [1m26[0m /  256    10.2%
-
-  [1mWorst gaps (showing 5 of 54)[0m
-  ────────────────────────────
-    level 1964   9 pets  given 28 → optimal 26  ([1m[33m+2[39m[0m)  optimal=`[32mCBcDEGdgIFbfAiHeha[39m`  given=`[33mDEBGgdIFbfAiHCceha[39m`
-    level 2067  10 pets  given 32 → optimal 30  ([1m[33m+2[39m[0m)  optimal=`[32mDHBdhIFbGAgiEfeCaJcj[39m`  given=`[33mHDBdhIFbGAgiEfeCaJcj[39m`
-    level 2073  10 pets  given 36 → optimal 34  ([1m[33m+2[39m[0m)  optimal=`[32mFGIgCcJEefiDAHjBdhab[39m`  given=`[33mAHDIhdBCcJaFbEefiGjg[39m`
-    level 2146  10 pets  given 29 → optimal 27  ([1m[33m+2[39m[0m)  optimal=`[32mIDidCHEceJGAjFfBhabg[39m`  given=`[33mAIDidCHEceJGjFfBhabg[39m`
-    level 2164  10 pets  given 31 → optimal 29  ([1m[33m+2[39m[0m)  optimal=`[32mAaIBDFfJbGiCdjEHcghe[39m`  given=`[33mIBDFfJdCbGiAajEHcghe[39m`
-[1m[92mWrote:[39m[0m ../web/public/data/precomputed.json
-```
+![Solver output](docs/solver-output.svg)
 
 ## Acknowledgements
 
