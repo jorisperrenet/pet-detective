@@ -47,7 +47,7 @@
 <main class="min-h-screen flex flex-col">
   <header class="px-4 sm:px-6 pt-1.5 pb-1 flex items-center justify-between max-w-5xl mx-auto w-full gap-3">
     <div class="flex items-center gap-3 min-w-0">
-      <img src="/sprites/board/card.svg" alt="" class="w-10 h-10 sm:w-11 sm:h-11 shrink-0" />
+      <img src="{import.meta.env.BASE_URL}sprites/board/card.svg" alt="" class="w-10 h-10 sm:w-11 sm:h-11 shrink-0" />
       <span class="text-base sm:text-xl font-semibold text-gray-100 truncate">Pet Detective Solver</span>
     </div>
     <div class="flex rounded-lg border border-white/10 overflow-hidden text-xs shrink-0">
