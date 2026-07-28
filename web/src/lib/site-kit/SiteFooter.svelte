@@ -4,8 +4,15 @@
 		sourceHref = '',
 		projectName = '',
 		localNavigation = false,
-		notice = ''
-	}: { sourceHref?: string; projectName?: string; localNavigation?: boolean; notice?: string } = $props();
+		notice = '',
+		additionalLinks = []
+	}: {
+		sourceHref?: string;
+		projectName?: string;
+		localNavigation?: boolean;
+		notice?: string;
+		additionalLinks?: Array<{ href: string; label: string }>;
+	} = $props();
 	const year = new Date().getFullYear();
 </script>
 
@@ -21,5 +28,9 @@
 			<span aria-hidden="true">·</span>
 			<a class="hover:text-blue-600 hover:underline dark:hover:text-blue-400" href={sourceHref}>Source{projectName ? ` for ${projectName}` : ''}</a>
 		{/if}
+		{#each additionalLinks as link}
+			<span aria-hidden="true">·</span>
+			<a class="hover:text-blue-600 hover:underline dark:hover:text-blue-400" href={link.href}>{link.label}</a>
+		{/each}
 	</p>
 </footer>

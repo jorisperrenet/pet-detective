@@ -18,7 +18,8 @@
 		logoSrc = '/personal-logo.svg',
 		menuLabel = '',
 		menuItems = [],
-		notice = ''
+		notice = '',
+		additionalLinks = []
 	}: {
 		children: Snippet;
 		active?: SiteSection;
@@ -33,11 +34,12 @@
 		menuLabel?: string;
 		menuItems?: SiteMenuItem[];
 		notice?: string;
+		additionalLinks?: Array<{ href: string; label: string }>;
 	} = $props();
 </script>
 
 <div class="flex min-h-screen flex-col bg-[#f9fbff] text-gray-900 dark:bg-[#111827] dark:text-gray-100">
 	<SiteHeader {active} {projectName} {currentProjectId} {projectHref} {localNavigation} {brandLogo} {logoSrc} {menuLabel} {menuItems} />
 	<main class={`flex-1 ${workspaceClass}`}>{@render children()}</main>
-	<SiteFooter {sourceHref} {projectName} {localNavigation} {notice} />
+	<SiteFooter {sourceHref} {projectName} {localNavigation} {notice} {additionalLinks} />
 </div>
