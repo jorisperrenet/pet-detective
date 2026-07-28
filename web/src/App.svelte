@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import LevelBrowser from './lib/components/LevelBrowser.svelte';
   import LevelEditor from './lib/components/LevelEditor.svelte';
+  import SiteHeader from './lib/site-kit/SiteHeader.svelte';
+  import SiteFooter from './lib/site-kit/SiteFooter.svelte';
 
   type Mode = 'find' | 'library';
   let mode = $state<Mode>('find');
@@ -44,27 +46,37 @@
   });
 </script>
 
-<main class="min-h-screen flex flex-col">
+<SiteHeader
+  projectName="Pet Detective"
+  currentProjectId="pet-detective"
+  projectHref="/pet-detective/"
+  logoSrc="{import.meta.env.BASE_URL}personal-logo.svg"
+/>
+<main class="flex min-h-screen flex-col bg-[#f9fbff] text-gray-900 dark:bg-[#111827] dark:text-gray-100">
   <header class="px-4 sm:px-6 pt-1.5 pb-1 flex items-center justify-between max-w-5xl mx-auto w-full gap-3">
     <div class="flex items-center gap-3 min-w-0">
       <img src="{import.meta.env.BASE_URL}sprites/board/card.svg" alt="" class="w-10 h-10 sm:w-11 sm:h-11 shrink-0" />
-      <span class="text-base sm:text-xl font-semibold text-gray-100 truncate">Pet Detective Solver</span>
+      <span class="truncate text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-xl">Pet Detective Solver</span>
     </div>
-    <div class="flex rounded-lg border border-white/10 overflow-hidden text-xs shrink-0">
+    <div class="flex shrink-0 overflow-hidden rounded-lg border border-gray-300 text-xs dark:border-gray-700">
       <button
         class="px-3 py-1.5 transition-colors"
         class:bg-car={mode === 'find'}
-        class:text-white={mode === 'find'}
-        class:text-gray-400={mode !== 'find'}
-        class:hover:text-gray-200={mode !== 'find'}
+        class:text-gray-950={mode === 'find'}
+        class:text-gray-600={mode !== 'find'}
+        class:dark:text-gray-300={mode !== 'find'}
+        class:hover:text-gray-900={mode !== 'find'}
+        class:dark:hover:text-white={mode !== 'find'}
         onclick={() => setMode('find')}
       >Find a level</button>
       <button
-        class="px-3 py-1.5 transition-colors border-l border-white/10"
+        class="border-l border-gray-300 px-3 py-1.5 transition-colors dark:border-gray-700"
         class:bg-car={mode === 'library'}
-        class:text-white={mode === 'library'}
-        class:text-gray-400={mode !== 'library'}
-        class:hover:text-gray-200={mode !== 'library'}
+        class:text-gray-950={mode === 'library'}
+        class:text-gray-600={mode !== 'library'}
+        class:dark:text-gray-300={mode !== 'library'}
+        class:hover:text-gray-900={mode !== 'library'}
+        class:dark:hover:text-white={mode !== 'library'}
         onclick={() => setMode('library')}
       >Solution library</button>
     </div>
@@ -78,23 +90,22 @@
     {/if}
   </section>
 
-  <footer class="px-6 py-6 text-center text-xs text-gray-500 max-w-2xl mx-auto leading-relaxed space-y-2">
-    <p>
-      Pet Detective, Lumosity, the Lumosity logo and every piece of in-game artwork shown here are
-      © <a href="https://www.lumoslabs.com" target="_blank" rel="noopener" class="underline decoration-dotted hover:text-gray-300">Lumos&nbsp;Labs,&nbsp;Inc.</a>
-      All rights reserved.
-    </p>
-    <p>
-      This page is an unaffiliated solver and visualiser — <strong>not the game</strong>. To actually play Pet Detective
-      (and everything else around it) head to <a href="https://www.lumosity.com/en/blog/pet-detective-behind-the-game" target="_blank" rel="noopener" class="underline decoration-dotted hover:text-gray-300">Lumosity</a>.
-    </p>
-    <p>
-      Lumosity's own write-up muses that for big enough routing problems
-      <em>"computers couldn't even find a solution in the lifetime of the universe."</em>
-      The Rust solver here chewed through all <span class="font-mono text-gray-400">2558</span> shipped levels in
-      <span class="font-mono text-gray-300">2.3&nbsp;s</span> on six cores. The in-game route is optimal for
-      <span class="font-mono text-gray-300">2504</span>; the remaining <span class="font-mono text-gray-300">54</span> ship a sub-optimal route —
-      <span class="font-mono">32</span> wasted one fuel and <span class="font-mono">22</span> wasted two.
-    </p>
-  </footer>
+  <aside class="mx-auto w-full max-w-3xl px-4 pb-6 sm:px-6" aria-labelledby="solver-note-heading">
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <h2 id="solver-note-heading" class="text-base font-bold text-gray-950 dark:text-white">Behind the solver</h2>
+      <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+        Lumosity notes that sufficiently large routing problems can become computationally intractable.
+        This Rust solver checked all <span class="font-mono text-gray-800 dark:text-gray-200">2,558</span> shipped levels in
+        <span class="font-mono text-gray-800 dark:text-gray-200">2.3&nbsp;seconds</span> on six cores.
+        The game’s supplied route is already optimal for <span class="font-mono text-gray-800 dark:text-gray-200">2,504</span>
+        of them—an impressive result. Of the remaining 54, 32 use one extra fuel and 22 use two.
+      </p>
+    </div>
+  </aside>
+
 </main>
+<SiteFooter
+  projectName="Pet Detective"
+  sourceHref="https://github.com/jorisperrenet/pet-detective"
+  notice="Pet Detective, Lumosity, the Lumosity logo and all in-game artwork shown here are © Lumos Labs, Inc. All rights reserved. This is an independent, unaffiliated solver and visualiser—not the game."
+/>

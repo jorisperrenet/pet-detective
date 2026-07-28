@@ -3,18 +3,34 @@
 @tailwind utilities;
 
 @layer base {
-  html, body {
+  html,
+  body {
     height: 100%;
   }
+
+  html {
+    background-color: #f9fbff;
+    color-scheme: light;
+  }
+
+  html.dark {
+    background-color: #111827;
+    color-scheme: dark;
+  }
+
   body {
-    background:
-      radial-gradient(ellipse at top, #2a2a30 0%, #161618 60%) fixed,
-      #0f0f10 fixed;
-    color: #e8e8ec;
+    margin: 0;
+    background-color: inherit;
+    color: #111827;
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+
+  html.dark body {
+    color: #f3f4f6;
+  }
+
   ::selection {
     background: #f47049;
     color: #1f1f22;
@@ -29,10 +45,10 @@
     @apply btn bg-car text-bg-deep hover:bg-orange-400 shadow-lg shadow-orange-500/20;
   }
   .btn-ghost {
-    @apply btn text-gray-300 hover:bg-white/5;
+    @apply btn text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
   }
   .panel {
-    @apply bg-bg-panel/60 backdrop-blur rounded-2xl border border-white/5 shadow-xl;
+    @apply rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800;
   }
 }
 

@@ -506,13 +506,13 @@
 <div class="flex flex-col gap-3">
   <div class="panel p-3">
     {#if chosenSize}
-      <div class="text-xs text-gray-400">Grid: <span class="font-mono">{chosenSize.cols}×{chosenSize.rows}</span></div>
+      <div class="text-xs text-gray-600 dark:text-gray-400">Grid: <span class="font-mono">{chosenSize.cols}×{chosenSize.rows}</span></div>
     {:else}
       <div class="text-xs text-gray-500 mb-2">Grid sizes:</div>
       <div class="flex flex-wrap gap-1.5">
         {#each SIZES as s}
           <button
-            class="px-3 py-1.5 rounded-md text-xs border bg-white/5 border-white/10 text-gray-300 hover:border-car/60 hover:text-white"
+            class="rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-xs text-gray-700 hover:border-car hover:text-gray-950 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:border-car/60 dark:hover:text-white"
             onclick={() => chooseSize(s)}
             onmouseenter={() => (hoverSize = s)}
             onmouseleave={() => { if (hoverSize === s) hoverSize = null; }}
@@ -554,25 +554,25 @@
     <div class="panel p-3">
       <div class="text-[11px] uppercase tracking-wider text-gray-500 mb-2">Matches</div>
       {#if !allBuiltin}
-        <div class="text-sm text-gray-400">Loading level database…</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400">Loading level database…</div>
       {:else if pairs.length === 0}
-        <div class="text-sm text-gray-400">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
           {candidates.length} levels of size {previewSize.cols}×{previewSize.rows} in the database.
         </div>
       {:else if candidates.length === 0}
-        <div class="text-sm text-red-300">
+        <div class="text-sm text-red-700 dark:text-red-300">
           No built-in level matches these placements. Did you mis-click? Press <em>Undo last</em>.
         </div>
       {:else if candidates.length === 1}
         {@const lv = candidates[0]}
         <div class="flex items-center justify-between gap-3 flex-wrap">
           <div class="text-sm">
-            <span class="text-emerald-300">Uniquely identified:</span>
-            <span class="font-mono text-emerald-200 ml-1">level #{lv.idx}</span>
-            <span class="text-gray-500"> · in-game fuel <span class="text-gray-200">{lv.parMoves}</span></span>
+            <span class="text-emerald-700 dark:text-emerald-300">Uniquely identified:</span>
+            <span class="ml-1 font-mono text-emerald-700 dark:text-emerald-200">level #{lv.idx}</span>
+            <span class="text-gray-500"> · in-game fuel <span class="text-gray-800 dark:text-gray-200">{lv.parMoves}</span></span>
             {#if lock}
               <span class="text-gray-500 ml-2">· orientation
-                <span class="text-gray-300 font-mono">
+                <span class="font-mono text-gray-700 dark:text-gray-300">
                   {lock.variant === 0 ? 'as-is' : lock.variant === 1 ? 'H-flip' : lock.variant === 2 ? 'V-flip' : '180°'}
                 </span></span>
             {/if}
@@ -589,8 +589,8 @@
             <div class="flex flex-wrap gap-1.5">
               {#each Array(lv.petCount) as _, levelLetter}
                 {@const userIdx = lock.assignment.findIndex((a) => a === levelLetter)}
-                <div class="flex items-center gap-1 px-2 py-1 rounded bg-white/5 border border-white/10 text-xs">
-                  <span class="font-mono text-gray-400">{String.fromCharCode(65 + levelLetter)}</span>
+                <div class="flex items-center gap-1 rounded border border-gray-200 bg-gray-50 px-2 py-1 text-xs dark:border-white/10 dark:bg-white/5">
+                  <span class="font-mono text-gray-600 dark:text-gray-400">{String.fromCharCode(65 + levelLetter)}</span>
                   <span class="text-gray-600">→</span>
                   {#if userIdx >= 0}
                     <img src={ANIMALS[userIdx].petSprite} alt="" class="h-5 w-auto" />
@@ -608,8 +608,8 @@
           </div>
         {/if}
       {:else}
-        <div class="text-sm text-gray-300">
-          <span class="font-mono text-gray-100">{candidates.length}</span>
+        <div class="text-sm text-gray-700 dark:text-gray-300">
+          <span class="font-mono text-gray-900 dark:text-gray-100">{candidates.length}</span>
           levels still match. Add another pet/house pair to narrow it down.
           {#if candidates.length <= 8}
             <ul class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs">
@@ -617,7 +617,7 @@
                 <li>
                   <button
                     type="button"
-                    class="block w-full text-left px-2 py-1 rounded bg-white/5 border border-white/10 text-gray-300 font-mono hover:border-car/60"
+                    class="block w-full rounded border border-gray-200 bg-gray-50 px-2 py-1 text-left font-mono text-gray-700 hover:border-car dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:border-car/60"
                     onclick={() => { pickedLevel = lv; }}
                     title="Pick this level — you'll need to fill in the remaining animals before solving"
                   >
@@ -634,21 +634,21 @@
     <div class="panel p-3">
       <div class="flex items-center gap-2 mb-3 flex-wrap">
         {#if !chosenSize}
-          <span class="text-sm text-gray-400">Select the grid size first.</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Select the grid size first.</span>
         {:else if step === 'pet' && nextLetterIndex < 11}
-          <span class="text-sm text-gray-300 inline-flex items-center gap-2">
+          <span class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
             Click where this animal sits:
             <img src={ANIMALS[nextLetterIndex].petSprite} alt="next pet"
               class="h-7 w-auto inline-block align-middle" />
           </span>
         {:else if step === 'house'}
-          <span class="text-sm text-gray-300 inline-flex items-center gap-2">
+          <span class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
             Click the matching house:
             <img src={ANIMALS[pairs.length].houseSprite} alt="next house"
               class="h-7 w-auto inline-block align-middle" />
           </span>
         {:else if step === 'done'}
-          <span class="text-sm text-gray-400">Done — {pairs.length} pet/house pair{pairs.length === 1 ? '' : 's'} placed.</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Done — {pairs.length} pet/house pair{pairs.length === 1 ? '' : 's'} placed.</span>
         {/if}
         {#if lock}
           <span class="text-xs text-gray-500 ml-2">

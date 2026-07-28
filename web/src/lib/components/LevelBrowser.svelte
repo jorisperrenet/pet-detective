@@ -213,20 +213,20 @@
 
 <div class="flex flex-col gap-2">
   {#if loadError}
-    <div class="panel p-4 text-red-300 border-red-500/40">
+    <div class="panel border-red-500/40 p-4 text-red-700 dark:text-red-300">
       <div class="font-semibold mb-1">Couldn't load levels</div>
       <p class="text-sm">{loadError}</p>
     </div>
   {:else if !groups}
-    <div class="panel p-6 text-center text-gray-400">Loading 2,558 levels…</div>
+    <div class="panel p-6 text-center text-gray-600 dark:text-gray-400">Loading 2,558 levels…</div>
   {:else if selectedLevel}
     <!-- Detail view -->
     <div class="panel p-4">
       <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
         <div class="flex items-center gap-2">
           <button class="btn-ghost text-xs px-2 py-1" onclick={backToList}>← back to list</button>
-          <span class="text-xs text-gray-400">
-            Level <span class="text-gray-200 font-mono">#{selectedLevel.idx}</span>
+          <span class="text-xs text-gray-600 dark:text-gray-400">
+            Level <span class="font-mono text-gray-800 dark:text-gray-200">#{selectedLevel.idx}</span>
             <span class="mx-1.5 text-gray-600">·</span>
             {selectedLevel.cols}×{selectedLevel.rows}
           </span>
@@ -234,19 +234,19 @@
         {#if solution}
           {@const beats = solution.fuel < selectedLevel.parMoves}
           <div class="flex items-center gap-1.5 text-xs">
-            <span class="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10">
+            <span class="rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 dark:border-white/10 dark:bg-white/5">
               <span class="text-gray-500">in-game fuel</span>
-              <span class="font-mono text-gray-100 ml-1">{selectedLevel.parMoves}</span>
+              <span class="ml-1 font-mono text-gray-900 dark:text-gray-100">{selectedLevel.parMoves}</span>
             </span>
             {#if beats}
-              <span class="px-1.5 py-0.5 rounded-md bg-yellow-500/15 border border-yellow-500/40 text-yellow-300">
-                <span class="text-yellow-400/80">optimal</span>
+              <span class="rounded-md border border-yellow-500/40 bg-yellow-500/15 px-1.5 py-0.5 text-yellow-800 dark:text-yellow-300">
+                <span class="text-yellow-700 dark:text-yellow-400/80">optimal</span>
                 <span class="font-mono ml-1">{solution.fuel}</span>
                 <span class="ml-1">⚠ saves {selectedLevel.parMoves - solution.fuel}</span>
               </span>
             {:else}
-              <span class="px-1.5 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">
-                <span class="text-emerald-400/80">optimal</span>
+              <span class="rounded-md border border-emerald-500/40 bg-emerald-500/15 px-1.5 py-0.5 text-emerald-800 dark:text-emerald-300">
+                <span class="text-emerald-700 dark:text-emerald-400/80">optimal</span>
                 <span class="font-mono ml-1">{solution.fuel}</span>
               </span>
             {/if}
@@ -255,7 +255,7 @@
       </div>
 
       {#if solving}
-        <div class="text-sm text-gray-400">Solving…</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400">Solving…</div>
       {:else if solution && displayedPuzzle}
         {@const ourHist = precomputed?.[selectedLevel.idx]?.hist ?? ''}
         <SolutionPlayer
@@ -267,7 +267,7 @@
         />
       {/if}
 
-      <div class="mt-4 pt-3 border-t border-white/5">
+      <div class="mt-4 border-t border-gray-200 pt-3 dark:border-white/5">
         <div class="text-[11px] uppercase tracking-wider text-gray-500 mb-2">Animals in this level</div>
         <AnimalKey layout="compact" highlight={(1 << selectedLevel.petCount) - 1} />
       </div>
@@ -279,15 +279,9 @@
       <div class="flex flex-wrap gap-1.5">
         {#each groups as g, i}
           <button
-            class="px-2.5 py-1 rounded-md text-xs border transition-colors"
-            class:bg-car={groupIdx === i}
-            class:text-white={groupIdx === i}
-            class:border-car={groupIdx === i}
-            class:bg-white={groupIdx !== i}
-            class:bg-opacity-5={groupIdx !== i}
-            class:border-white={groupIdx !== i}
-            class:border-opacity-10={groupIdx !== i}
-            class:text-gray-300={groupIdx !== i}
+            class="rounded-md border px-2.5 py-1 text-xs transition-colors {groupIdx === i
+              ? 'border-car bg-car text-gray-950'
+              : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-car dark:border-white/10 dark:bg-white/5 dark:text-gray-300'}"
             onclick={() => selectGroup(i)}
           >
             <span class="font-mono">{g.petCount}</span>
@@ -302,7 +296,7 @@
     {#if currentGroup}
       <div class="panel px-3 py-2">
         <div class="flex items-center justify-between mb-2 text-xs text-gray-500">
-          <span><span class="text-gray-300 font-mono">{currentGroup.levels.length}</span> levels</span>
+          <span><span class="font-mono text-gray-700 dark:text-gray-300">{currentGroup.levels.length}</span> levels</span>
           <span>fuel range {currentGroup.levels.reduce((m, l) => Math.min(m, l.parMoves), Infinity)}–{currentGroup.levels.reduce((m, l) => Math.max(m, l.parMoves), 0)}</span>
         </div>
         <div class="grid gap-0.5" style="grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));">
@@ -319,23 +313,11 @@
             {@const bfs = pre?.fuel ?? null}
             {@const wasted = cf != null && bfs != null ? cf - bfs : 0}
             <a
-              class="aspect-square rounded-[3px] border flex flex-col items-center justify-center font-mono leading-none transition-colors no-underline"
-              class:border-white={wasted === 0}
-              class:border-opacity-10={wasted === 0}
-              class:bg-white={wasted === 0}
-              class:bg-opacity-5={wasted === 0}
-              class:text-gray-300={wasted === 0}
-              class:hover:border-car={wasted === 0}
-              class:hover:bg-car={wasted === 0}
-              class:hover:bg-opacity-15={wasted === 0}
-              class:bg-yellow-500={wasted === 1}
-              class:bg-opacity-15={wasted === 1}
-              class:border-yellow-500={wasted === 1}
-              class:border-opacity-50={wasted === 1}
-              class:text-yellow-100={wasted === 1}
-              class:bg-red-500={wasted >= 2}
-              class:border-red-500={wasted >= 2}
-              class:text-red-100={wasted >= 2}
+              class="flex aspect-square flex-col items-center justify-center rounded-[3px] border font-mono leading-none no-underline transition-colors {wasted === 0
+                ? 'border-gray-300 bg-gray-50 text-gray-700 hover:border-car hover:bg-orange-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-car/15'
+                : wasted === 1
+                  ? 'border-yellow-500/50 bg-yellow-100 text-yellow-900 dark:bg-yellow-500/15 dark:text-yellow-100'
+                  : 'border-red-500 bg-red-100 text-red-900 dark:bg-red-500 dark:text-red-100'}"
               href={`?level=${lv.idx}`}
               onclick={(e) => {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;

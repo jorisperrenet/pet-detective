@@ -255,8 +255,8 @@
         <div class="h-full bg-gradient-to-r from-car to-orange-300 rounded-full transition-[width] duration-100"
           style:width="{Math.max(0, Math.min(100, progressPct))}%"></div>
       </div>
-      <div class="text-gray-300 text-xs tabular-nums shrink-0">
-        <span class="text-car">{fuelUsed}</span> / {solution.fuel}
+      <div class="shrink-0 tabular-nums text-xs text-gray-700 dark:text-gray-300">
+        <span class="text-orange-700 dark:text-car">{fuelUsed}</span> / {solution.fuel}
       </div>
     </div>
   {/if}
@@ -285,13 +285,13 @@
             <div class="text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-0.5">
               {progress >= totalSteps ? 'Complete' : `Stop ${Math.min(totalSteps, Math.floor(progress) + 1)} / ${totalSteps}`}
             </div>
-            <div class="text-xs sm:text-sm text-gray-100 leading-tight truncate">
+            <div class="truncate text-xs leading-tight text-gray-900 dark:text-gray-100 sm:text-sm">
               {#if progress >= totalSteps}
                 Delivered {puzzle.animals.length} pets in {solution.fuel} fuel.
               {:else if nextStep?.type === 'animal'}
-                Drive {stepFuel(currentStepIdx)} cell{stepFuel(currentStepIdx) === 1 ? '' : 's'} — pick up <span style:color={`hsl(${puzzle.hues[nextStep.idx]}, 70%, 65%)`}>pet&nbsp;{String.fromCharCode(97 + nextStep.idx)}</span>.
+                Drive {stepFuel(currentStepIdx)} cell{stepFuel(currentStepIdx) === 1 ? '' : 's'} — pick up <span class="font-semibold">pet&nbsp;{String.fromCharCode(97 + nextStep.idx)}</span>.
               {:else if nextStep}
-                Drive {stepFuel(currentStepIdx)} cell{stepFuel(currentStepIdx) === 1 ? '' : 's'} — drop off at <span style:color={`hsl(${puzzle.hues[nextStep.idx]}, 70%, 65%)`}>house&nbsp;{String.fromCharCode(65 + nextStep.idx)}</span>.
+                Drive {stepFuel(currentStepIdx)} cell{stepFuel(currentStepIdx) === 1 ? '' : 's'} — drop off at <span class="font-semibold">house&nbsp;{String.fromCharCode(65 + nextStep.idx)}</span>.
               {/if}
             </div>
           </div>
@@ -299,8 +299,8 @@
         <div class="text-right tabular-nums shrink-0">
           <div class="text-[10px] uppercase tracking-[0.18em] text-gray-500">Fuel</div>
           <div class="text-lg font-semibold leading-none">
-            <span class="text-car">{fuelUsed}</span>
-            <span class="text-gray-600 text-sm"> / {solution.fuel}</span>
+            <span class="text-orange-700 dark:text-car">{fuelUsed}</span>
+            <span class="text-sm text-gray-600 dark:text-gray-400"> / {solution.fuel}</span>
           </div>
         </div>
       </div>
@@ -331,10 +331,10 @@
             <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
           </svg>
         </button>
-        <div class="flex items-center gap-1.5 text-[11px] text-gray-400 w-full sm:w-auto ml-auto">
+        <div class="ml-auto flex w-full items-center gap-1.5 text-[11px] text-gray-700 dark:text-gray-300 sm:w-auto">
           <span>Speed</span>
           <input type="range" min="0.25" max="3" step="0.25" bind:value={speedMul} class="accent-car w-20" />
-          <span class="tabular-nums w-8 text-right text-gray-200">{speedMul.toFixed(2)}×</span>
+          <span class="w-8 text-right tabular-nums font-medium text-gray-900 dark:text-gray-100">{speedMul.toFixed(2)}×</span>
         </div>
       </div>
     </section>
@@ -383,12 +383,12 @@
     </section>
 
     <!-- Inline stats line — small, secondary. -->
-    <div class="flex items-center justify-center text-xs text-gray-500 gap-3 flex-wrap">
-      <span><span class="text-car font-medium">{solution.fuel}</span> fuel optimal</span>
+    <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+      <span><span class="font-medium text-orange-700 dark:text-car">{solution.fuel}</span> fuel optimal</span>
       <span class="text-gray-700">·</span>
-      <span><span class="text-gray-300 font-medium">{puzzle.animals.length}</span> pets</span>
+      <span><span class="font-medium text-gray-800 dark:text-gray-300">{puzzle.animals.length}</span> pets</span>
       <span class="text-gray-700">·</span>
-      <span><span class="text-gray-300 font-medium">{totalSteps}</span> stops</span>
+      <span><span class="font-medium text-gray-800 dark:text-gray-300">{totalSteps}</span> stops</span>
     </div>
 
     {#if lumosityHist || ourHist}
@@ -396,13 +396,13 @@
         {#if lumosityHist}
           <span>
             Lumosity solution:
-            <span class="font-mono text-gray-300">{lumosityHist}</span>
+            <span class="font-mono text-gray-700 dark:text-gray-300">{lumosityHist}</span>
           </span>
         {/if}
         {#if ourHist}
           <span>
             Our optimal solution:
-            <span class="font-mono text-gray-300">{ourHist}</span>
+            <span class="font-mono text-gray-700 dark:text-gray-300">{ourHist}</span>
           </span>
         {/if}
       </div>
